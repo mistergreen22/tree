@@ -17,43 +17,38 @@ more_vars = [
 class Node:
     def __init__(self, value, index, parent=None):
         self._parent = parent
-        self._childred = []
+        self._children = []
         self._value = value
         self._index = index
-# Create Node() obj
-# format output f''
-# triple lvl of nesting using for
-# compare structure
 
     def add_child(self, child):
-        self._childred.append(child)
-
-
-
-
+        self._children.append(child)
 
     def __str__(self):
-        return f'{type(self._value)} -> {len(self._childred)}'
+        return f'{type(self._value)} -> {len(self._children)}'
 
     def uuid(self):
-        return f'{self._value if not len(self._childred) else ""}|{self._index}|{self._parent.uuid()}'
+        return f'{self._value if not len(self._children) else ""}|{self._index}|{self._parent.uuid()}'
 
+    def __len__(self):
+        return len(self._children)
 
 
 def data_to_tree(data):
     root = Node(data, 1)
-    for my_list, my_index in zip(data, range(len(data))):
-        var = Node(my_list, my_index, root)
-        root.add_child(var)
-        for sec_list, 
-    #.....
+    for outer_list, my_index in zip(data, range(len(data))):
+        outer_node = Node(outer_list, my_index, root)
+        root.add_child(outer_node)
+        for inner_list, i in zip(outer_node, range(len(outer_node))):
+            inner_node = Node(inner_list, i, outer_node)
+            root.add_child(inner_node)
+            for inner_dict, y in zip(outer_node, range(len(inner_node))):
+                dict_node = Node(inner_dict, y, inner_node)
+                root.add_child(dict_node)
 
     return root
 
 
-def important_method_for_someth():
-    pass
-
-
 if __name__ == "__main__":
-    assert expected_result == actual_result
+    print(data_to_tree(expected_result))
+    #assert expected_result == actual_result
