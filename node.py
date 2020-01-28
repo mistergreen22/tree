@@ -30,8 +30,6 @@ class Node:
     def uuid(self):
         return f'{self._value if not len(self._children) else ""}|{self._index}|{self._parent.uuid()}'
 
-    def __len__(self):
-        return len(self._children)
 
 
 def data_to_tree(data):
@@ -39,10 +37,10 @@ def data_to_tree(data):
     for outer_list, my_index in zip(data, range(len(data))):
         outer_node = Node(outer_list, my_index, root)
         root.add_child(outer_node)
-        for inner_list, i in zip(outer_node, range(len(outer_node))):
+        for inner_list, i in zip(outer_list, range(len(outer_list))):
             inner_node = Node(inner_list, i, outer_node)
             root.add_child(inner_node)
-            for inner_dict, y in zip(outer_node, range(len(inner_node))):
+            for inner_dict, y in zip(inner_list, range(len(inner_list))):
                 dict_node = Node(inner_dict, y, inner_node)
                 root.add_child(dict_node)
 
