@@ -31,18 +31,17 @@ class Node:
         return f'{self._value if not len(self._children) else ""}|{self._index}|{self._parent.uuid()}'
 
 
-
 def data_to_tree(data):
     root = Node(data, 1)
-    for outer_list, my_index in zip(data, range(len(data))):
-        outer_node = Node(outer_list, my_index, root)
+    for list_in_list, index_for_list in zip(data, range(len(data))):
+        outer_node = Node(list_in_list, index_for_list, root)
         root.add_child(outer_node)
-        for inner_list, i in zip(outer_list, range(len(outer_list))):
-            inner_node = Node(inner_list, i, outer_node)
-            root.add_child(inner_node)
-            for inner_dict, y in zip(inner_list, range(len(inner_list))):
-                dict_node = Node(inner_dict, y, inner_node)
-                root.add_child(dict_node)
+        for dict_in_list, index_for_dict in zip(list_in_list, range(len(list_in_list))):
+            inner_left_node = Node(dict_in_list, index_for_dict, outer_node)
+            root.add_child(inner_left_node)
+            for value_in_dict, index_for_value in zip(dict_in_list, range(len(dict_in_list))):
+                inner_right_node = Node(value_in_dict, index_for_value, inner_left_node)
+                root.add_child(inner_right_node)
 
     return root
 
