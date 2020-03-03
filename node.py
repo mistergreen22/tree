@@ -1,6 +1,6 @@
 expected_result = [
-    [{'a': 1}],
-    [{'a': 2}, {'a': 1}]
+    [{'a': 1212}],
+    [{'a': 2121}, {'a': 1212}]
 ]
 
 actual_result = [
@@ -9,8 +9,8 @@ actual_result = [
 ]
 
 more_vars = [
-    [{'a': 1}, {'a': 2}],
-    [{'a': 1}]
+    [{'ip': '22.22.22.22'}, {'ip': '23.23.23.23'}],
+    [{'ip': '23.23.23.23'}]
 ]
 
 
@@ -28,7 +28,13 @@ class Node:
         return f'{type(self._value)} -> {len(self._children)}'
 
     def uuid(self):
-        return f'{self._value if not len(self._children) else ""}|{self._index}|{self._parent.uuid()}'
+        return f'{self._value if not len(self._children) else ""}|{self._index}| {self._parent.uuid() if self._parent is not None else ""}'
+
+    def __eq__(self, other):
+        if self.uuid() == other.uuid() and sorted(self._children) == sorted(other._children):
+            return True
+        else:
+            return False
 
 
 def data_to_tree(data):
@@ -39,7 +45,7 @@ def data_to_tree(data):
         for dict_in_list, index_for_dict in zip(list_in_list, range(len(list_in_list))):
             inner_left_node = Node(dict_in_list, index_for_dict, outer_node)
             root.add_child(inner_left_node)
-            for value_in_dict, index_for_value in zip(dict_in_list, range(len(dict_in_list))):
+            for value_in_dict, index_for_value in zip(dict_in_list.values(), range(len(dict_in_list))):
                 inner_right_node = Node(value_in_dict, index_for_value, inner_left_node)
                 root.add_child(inner_right_node)
 
@@ -47,5 +53,10 @@ def data_to_tree(data):
 
 
 if __name__ == "__main__":
-    print(data_to_tree(expected_result))
+
+    print(data_to_tree(more_vars))
+    var = data_to_tree(more_vars)
+    var2 = var.uuid()
+    print(var2)
+    print(data_to_tree(expected_result).uuid() == data_to_tree(actual_result).uuid())
     #assert expected_result == actual_result
