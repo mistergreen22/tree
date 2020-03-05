@@ -1,15 +1,29 @@
-expected_result = [
-    [{'a': 1212}],
-    [{'a': 2121}, {'a': 1212}]
+
+valid_variant_one = [
+    [{'ip': '22.22.22.22'}],
+    [{'ip': '23.23.23.23'}, {'ip': '23.23.23.23'}]
 ]
 
-actual_result = [
-    [{'a': 1}],
-    [{'a': 1}, {'a': 2}]
-]
 
-more_vars = [
+valid_variant_two = [
     [{'ip': '22.22.22.22'}, {'ip': '23.23.23.23'}],
+    [{'ip': '23.23.23.23'}]
+]
+
+
+valid_variant_three = [
+    [{'ip': '23.23.23.23'}],
+    [{'ip': '23.23.23.23'}, {'ip': '22.22.22.22'}]
+]
+
+
+valid_variant_four = [
+    [{'ip': '23.23.23.23'}, {'ip': '22.22.22.22'}],
+    [{'ip': '23.23.23.23'}]
+]
+
+invalid_variant = [
+    [{'ip': '24.24.24.24'}, {'ip': '22.22.22.22'}],
     [{'ip': '23.23.23.23'}]
 ]
 
@@ -27,15 +41,6 @@ class Node:
     def __str__(self):
         return f'{type(self._value)} -> {len(self._children)}'
 
-    def uuid(self):
-        return f'{self._value if not len(self._children) else ""}|{self._index}| {self._parent.uuid() if self._parent is not None else ""}'
-
-    def __eq__(self, other):
-        if self.uuid() == other.uuid() and sorted(self._children) == sorted(other._children):
-            return True
-        else:
-            return False
-
 
 def data_to_tree(data):
     root = Node(data, 1)
@@ -44,19 +49,44 @@ def data_to_tree(data):
         root.add_child(outer_node)
         for dict_in_list, index_for_dict in zip(list_in_list, range(len(list_in_list))):
             inner_left_node = Node(dict_in_list, index_for_dict, outer_node)
-            root.add_child(inner_left_node)
+            outer_node.add_child(inner_left_node)
             for value_in_dict, index_for_value in zip(dict_in_list.values(), range(len(dict_in_list))):
                 inner_right_node = Node(value_in_dict, index_for_value, inner_left_node)
-                root.add_child(inner_right_node)
+                inner_left_node.add_child(inner_right_node)
 
     return root
 
 
+def get_sorted_tree_value(tree):
+    values = []
+    for list_in_list in tree._children:
+        for dict_in_list in list_in_list._children:
+            for dict_values in dict_in_list._children:
+                values.append(dict_values._value)
+    return sorted(values)
+
+
 if __name__ == "__main__":
 
-    print(data_to_tree(more_vars))
-    var = data_to_tree(more_vars)
-    var2 = var.uuid()
-    print(var2)
-    print(data_to_tree(expected_result).uuid() == data_to_tree(actual_result).uuid())
-    #assert expected_result == actual_result
+    assert get_sorted_tree_value(
+        data_to_tree(valid_variant_one)) == get_sorted_tree_value(
+        data_to_tree(valid_variant_two))
+    assert get_sorted_tree_value(
+        data_to_tree(valid_variant_one)) == get_sorted_tree_value(
+        data_to_tree(valid_variant_three))
+    assert get_sorted_tree_value(
+        data_to_tree(valid_variant_one)) == get_sorted_tree_value(
+        data_to_tree(valid_variant_four))
+    assert get_sorted_tree_value(
+        data_to_tree(valid_variant_two)) == get_sorted_tree_value(
+        data_to_tree(valid_variant_three))
+    assert get_sorted_tree_value(
+        data_to_tree(valid_variant_two)) == get_sorted_tree_value(
+        data_to_tree(valid_variant_four))
+    assert get_sorted_tree_value(
+        data_to_tree(valid_variant_three)) == get_sorted_tree_value(
+        data_to_tree(valid_variant_four))
+
+    assert get_sorted_tree_value(
+        data_to_tree(valid_variant_one)) != get_sorted_tree_value(
+        data_to_tree(invalid_variant))
